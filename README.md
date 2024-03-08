@@ -1,5 +1,5 @@
 ﻿# Rock Paper Scissors
-An game of rock paper scissors which is available offline as well as online. Created with pygame
+A game of rock paper scissors which is available offline as well as online. Created with pygame
 
 # To Start The Game
 To run the game you will need to run the file *server.py* on one computer. Then you can run the file *rock-paper-scissors.py* on other computers to connect.

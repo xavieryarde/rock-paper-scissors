@@ -224,7 +224,6 @@ def redrawWindow(screen, game, player):
         p1name = game.get_player_name(0)
         p2name = game.get_player_name(1)
         count = game.get_countdown()
-        print(f"this is: {count}")
         update_message("")
         if game.bothWent():
              player_choice()

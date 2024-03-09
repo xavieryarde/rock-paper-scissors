@@ -17,6 +17,7 @@ except socket.error as e:
 s.listen(2)
 print("Waiting for a connection, Server Started")
 
+options = ["Rock", "Paper", "Scissors"]
 connected = set()
 games = {}
 idCount = 0
@@ -31,7 +32,6 @@ def threaded_client(conn, p, gameId):
     while True:
         try:
             data = conn.recv(4096).decode()
-            print(data)
 
             if gameId in games:
                 game = games[gameId]
@@ -52,10 +52,16 @@ def threaded_client(conn, p, gameId):
 
                     elapsed_time = game.get_elapsed_time()
                     if elapsed_time > timeout:
-                        options = ["Rock", "Paper", "Scissors"]
-                        random_choice = random.choice(options)
-                        game.play(p, random_choice)
+                        if p == 0:
+                            if not game.p1Went:
+                                random_choice = random.choice(options)
+                                game.play(p, random_choice)
 
+                        else:
+                            if not game.p2Went:
+                                random_choice = random.choice(options)
+                                game.play(p, random_choice)
+    
 
                     game.set_countdown(int(timeout - elapsed_time))
 

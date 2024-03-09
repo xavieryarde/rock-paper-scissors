@@ -155,6 +155,7 @@ def main():
         for event in pygame.event.get():
             if event.type == QUIT:
                 running = False
+                sys.exit()
             elif event.type == MOUSEBUTTONDOWN:
                 update_message("")
                 mouse_pos = pygame.mouse.get_pos()
@@ -228,7 +229,6 @@ def main():
 
 
     pygame.quit()
-    sys.exit()
 
 
 if __name__ == "__main__":

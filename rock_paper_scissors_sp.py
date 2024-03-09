@@ -3,6 +3,7 @@ from pygame.locals import *
 import random
 import os
 import sys
+import main_game
 
 options = ["Rock", "Paper", "Scissors"]
 
@@ -108,6 +109,8 @@ font = pygame.font.Font(os.path.abspath(os.path.join(os.path.dirname(__file__),"
 text_font = pygame.font.Font(os.path.abspath(os.path.join(os.path.dirname(__file__),"Retro Gaming.ttf")), 20)
 
 # Load images
+back_image = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "back_image.png")))
+
 user_rock = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "user_rock.png")))
 user_paper = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "user_paper.png")))
 user_scissors = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "user_scissors.png")))
@@ -117,6 +120,8 @@ comp_paper = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__fi
 comp_scissors = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "comp_scissors.png")))
 
 # Set width and height as desired
+back_image = pygame.transform.scale(back_image, (50, 50))
+
 user_rock = pygame.transform.scale(user_rock, (200, 200)) 
 user_paper = pygame.transform.scale(user_paper, (200, 200))
 user_scissors = pygame.transform.scale(user_scissors, (200, 200))
@@ -145,6 +150,12 @@ comp_score_text = "0"
 # Message
 message = pygame.Surface((450, 50), pygame.SRCALPHA)
 
+# Back Button
+back_btn_surface = pygame.Surface((50,50), pygame.SRCALPHA)
+back_btn_surface.blit(back_image, (0 , 0))
+
+
+
 # Game loop
 def main():
     running = True
@@ -165,10 +176,17 @@ def main():
                     player_choice("Paper")
                 elif scissors_option_rect.collidepoint(mouse_pos):
                     player_choice("Scissors")
-
+                elif back_btn.collidepoint(mouse_pos):
+                    running = False
+                    main_game.main_menu()
+               
         # Draw everything
         screen.fill((255, 255, 255))
 
+        back_btn = pygame.Rect(0, 0, 50, 50)
+        pygame.draw.rect(screen, (255, 255, 255), back_btn)
+
+        screen.blit(back_btn_surface, (0, 0))
         screen.blit(user_label, (100, 200))
         screen.blit(comp_label, (600, 200))
         screen.blit(is_user, (163, 80))
@@ -228,9 +246,10 @@ def main():
         pygame.display.update()
 
 
-    pygame.quit()
+    
 
 
 if __name__ == "__main__":
     main()
+    pygame.quit()
 

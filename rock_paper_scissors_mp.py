@@ -88,6 +88,8 @@ font = pygame.font.Font(os.path.abspath(os.path.join(os.path.dirname(__file__),"
 text_font = pygame.font.Font(os.path.abspath(os.path.join(os.path.dirname(__file__),"Retro Gaming.ttf")), 20)
 
 # Load images
+back_image = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "back_image.png")))
+
 user_rock = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "user_rock.png")))
 user_paper = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "user_paper.png")))
 user_scissors = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "user_scissors.png")))
@@ -97,6 +99,8 @@ comp_paper = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__fi
 comp_scissors = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "comp_scissors.png")))
 
 # Set width and height as desired
+back_image = pygame.transform.scale(back_image, (50, 50))
+
 user_rock = pygame.transform.scale(user_rock, (200, 200)) 
 user_paper = pygame.transform.scale(user_paper, (200, 200))
 user_scissors = pygame.transform.scale(user_scissors, (200, 200))
@@ -122,6 +126,12 @@ comp_score_text = "0"
 
 # Message
 message = pygame.Surface((450, 50), pygame.SRCALPHA)
+
+# Back Button
+back_btn_surface = pygame.Surface((50,50), pygame.SRCALPHA)
+back_btn_surface.blit(back_image, (0 , 0))
+
+back_btn = pygame.Rect(0, 0, 50, 50)
 
 
 rect_width = 200
@@ -214,8 +224,12 @@ def redrawWindow(screen, game, player):
     screen.fill((255, 255, 255))
 
     if not(game.connected()):
+        
         text = font.render("Waiting for Player...", True, (0, 0, 0))
         screen.blit(text, (screen.get_width()//2 - text.get_width()//2, screen.get_height()//2 - text.get_height()//2))
+        pygame.draw.rect(screen, (255, 255, 255), back_btn)
+        screen.blit(back_btn_surface, (0, 0))
+        
         
     else:
 
@@ -265,6 +279,10 @@ def redrawWindow(screen, game, player):
             is_user = font.render(p2name, True, (0, 0, 0))
             is_comp = font.render(p1name, True, (0, 0, 0))
 
+        
+        pygame.draw.rect(screen, (255, 255, 255), back_btn)
+
+        screen.blit(back_btn_surface, (0, 0))
         screen.blit(is_user, (163, 80))
         screen.blit(player_score, (350, 200))  
         screen.blit(is_comp, (641, 80))
@@ -306,14 +324,44 @@ def input_screen():
     # Start with entering the server address
     phase = 'enter_server'  
 
+    # Blinking animation variables
+    cursor_visible = True
+    cursor_blink_interval = 500 
+    last_blink_time = 0
+    cursor_delay = 1000 
+    last_key_press_time = 0
+
     while running:
         clock.tick(60)
         screen.fill((255, 255, 255))
 
+        pygame.draw.rect(screen, (255, 255, 255), back_btn)
+        screen.blit(back_btn_surface, (0, 0))
+
         # Draw the input box and text
         txt_surface = font.render(input_text, True, color)
-        screen.blit(txt_surface, (input_box.x + (input_box.width - txt_surface.get_width()) // 2, input_box.y + 5))
+        txt_width, txt_height = txt_surface.get_size()
+        text_x = input_box.x + (input_box.width - txt_width) // 2
+        text_y = input_box.y + (input_box.height - txt_height) // 2
+        screen.blit(txt_surface, (text_x, text_y))
+
+        # Calculate cursor position
+        cursor_x = text_x + txt_width  # X-coordinate for the cursor
+        cursor_y = input_box.y + 10
+        cursor_end_y = input_box.y + input_box.height - 10
+
+        # Draw the input box
         pygame.draw.rect(screen, color, input_box, 2)
+
+        # Blinking animation for the cursor
+        current_time = pygame.time.get_ticks()
+        if current_time - last_blink_time >= cursor_blink_interval and current_time - last_key_press_time >= cursor_delay:
+            cursor_visible = not cursor_visible
+            last_blink_time = current_time
+
+        # Draw the cursor if it's visible
+        if cursor_visible:
+            pygame.draw.line(screen, color, (cursor_x, cursor_y), (cursor_x, cursor_end_y), 2)
 
         if phase == 'enter_server':
             prompt_text = "Please enter server address"
@@ -329,8 +377,16 @@ def input_screen():
             if event.type == QUIT:
                 running = False
                 sys.exit()
-              
+
+            elif event.type == MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                if back_btn.collidepoint(mouse_pos):
+                        running = False
+                        main_game.main_menu()
+            
             elif event.type == KEYDOWN:
+                cursor_visible = True  # Show cursor when typing
+                last_key_press_time = current_time  # Update last key press time
                 if event.key == K_RETURN:
                     global server
                     global name
@@ -353,11 +409,16 @@ def input_screen():
                     
                 elif event.key == K_BACKSPACE:
                     input_text = input_text[:-1]
+                    
                 elif event.key == K_v and (pygame.key.get_mods() & KMOD_CTRL or pygame.key.get_mods() & KMOD_META):
                     # Check for paste event (Ctrl+V or Command+V)
                     clipboard_text = pygame.scrap.get(pygame.SCRAP_TEXT)
                     if clipboard_text:
                         input_text += clipboard_text.decode('utf-8', 'ignore').replace('\0', '')
+                
+                elif event.key == K_d and (pygame.key.get_mods() & KMOD_CTRL or pygame.key.get_mods() & KMOD_META):
+                    input_text = ''
+
                 else:
                     input_text += event.unicode
 
@@ -444,19 +505,32 @@ def main():
                         else:
                             if not game.p2Went:
                                 n.send("Scissors")
+
+
+                    elif back_btn.collidepoint(mouse_pos):
+                        running = False
+                        n.close_connection()
+                       
+
+        
                                 
 
             
             redrawWindow(screen, game, player)
 
-        pygame.quit()   
+        
+
+    
+
+           
 
 
 
 
 if __name__ == "__main__":
     main()
-   
+    pygame.quit()
+    
 
 
 

@@ -4,9 +4,20 @@ import random
 import os
 import sys
 import main_game
+import csv
 
 options = ["Rock", "Paper", "Scissors"]
 
+def initialize_csv():
+    with open('stats_sp.csv', mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(["Round","Player Choice", "Computer Choice", "Player Score", "Computer Score", "Winner"])
+
+def record_game_outcome(round_number, player_choice, computer_choice, player_score, computer_score, winner):
+ 
+    with open('stats_sp.csv', mode='a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow([round_number, player_choice, computer_choice, player_score, computer_score, winner])
 
 def player_choice(x):
     random_num = random.randint(0, 2)
@@ -81,20 +92,30 @@ def update_computer_score():
     comp_score.blit(comp_score_surf, (0, 0))
 
 def check_winner(player, computer):
+    global comp_score_text
+    global player_score_text
+    global rounds_played
+    rounds_played += 1
+
     if player == computer:
         update_message("Draw!")
+        record_game_outcome(rounds_played, player, computer, player_score_text, comp_score_text, "Draw")
     elif player == "Rock" and computer == "Scissors":
         update_message("Player Won!")
         update_player_score()
+        record_game_outcome(rounds_played, player, computer, player_score_text, comp_score_text, "Player")
     elif player == "Paper" and computer == "Rock":
         update_message("Player Won!")
         update_player_score()
+        record_game_outcome(rounds_played, player, computer, player_score_text, comp_score_text, "Player")
     elif player == "Scissors" and computer == "Paper":
         update_message("Player Won!")
         update_player_score()
+        record_game_outcome(rounds_played, player, computer, player_score_text, comp_score_text, "Player")
     else:
         update_message("Computer Won!")
         update_computer_score()
+        record_game_outcome(rounds_played, player, computer, player_score_text, comp_score_text, "Computer")
     
     
 
@@ -143,7 +164,7 @@ comp_score = pygame.Surface((50, 50), pygame.SRCALPHA)
 is_user = font.render("Player", True, (0, 0, 0))
 is_comp = font.render("Computer", True, (0, 0, 0))
 
-
+rounds_played = 0
 player_score_text = "0"
 comp_score_text = "0"
 
@@ -250,6 +271,7 @@ def main():
 
 
 if __name__ == "__main__":
+    initialize_csv()
     main()
     pygame.quit()
 

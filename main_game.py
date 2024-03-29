@@ -49,11 +49,13 @@ def main_menu():
 
         if button_1.collidepoint((mx, my)):
             if click:
+                rock_paper_scissors_sp.initialize_csv()
                 rock_paper_scissors_sp.main()
                 
                 
         if button_2.collidepoint((mx, my)):
             if click:
+                rock_paper_scissors_mp.initialize_csv()
                 rock_paper_scissors_mp.main()
                 
         if button_3.collidepoint((mx, my)):

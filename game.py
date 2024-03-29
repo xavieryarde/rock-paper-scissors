@@ -12,6 +12,7 @@ class Game:
         self.wins = [0, 0]
         self.ties = 0
         self.start_time = None
+        self.move_times = [None, None]
 
     def get_player_move(self, p):
         return self.moves[p]
@@ -27,6 +28,9 @@ class Game:
 
     def get_countdown(self):
         return self.countdown
+    
+    def get_player_response_times(self, p):
+        return self.move_times[p]
 
     def start_timer(self):
         self.start_time = time.time()
@@ -39,6 +43,7 @@ class Game:
 
     def play(self, player, move):
         self.moves[player] = move
+        self.move_times[player] = int(time.time() - self.start_time)
         if player == 0:
             self.p1Went = True
         else:

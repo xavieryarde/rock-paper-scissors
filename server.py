@@ -21,7 +21,7 @@ options = ["Rock", "Paper", "Scissors"]
 connected = set()
 games = {}
 idCount = 0
-timeout = 10
+timeout = 15
 
 
 def threaded_client(conn, p, gameId):

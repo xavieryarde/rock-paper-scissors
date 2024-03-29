@@ -5,8 +5,27 @@ import os
 import random
 from network import Network
 import main_game
+import csv
+import pandas as pd
 
 options = ["Rock", "Paper", "Scissors"]
+
+def initialize_csv():
+    with open('stats_mp.csv', mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(["Round","Player 1 Choice", "Player 2 Choice", "Player 1 Score", "Player 2 Score", "Player 1 Response Time", "Player 2 Resonse Time", "Winner"])
+
+def record_game_outcome(round_number, player_choice, computer_choice, player_score, computer_score, player_time, computer_time, winner):
+ 
+    with open('stats_mp.csv', mode='a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow([round_number, player_choice, computer_choice, player_score, computer_score, player_time, computer_time, winner])
+
+    df = pd.read_csv('stats_mp.csv', sep=',')
+    df.drop_duplicates(subset=None, inplace=True)
+
+    df.to_csv('stats_mp.csv', index=False)
+
 
 
 def reveal_count_down(): 
@@ -120,7 +139,7 @@ comp_score = pygame.Surface((50, 50), pygame.SRCALPHA)
 
 
 
-
+rounds_played = 0
 player_score_text = "0"
 comp_score_text = "0"
 
@@ -207,12 +226,22 @@ def redrawWindow(screen, game, player):
     def check_winner():
         p1name = game.get_player_name(0)
         p2name = game.get_player_name(1)
+        p1_response_time = game.get_player_response_times(0)
+        p2_response_time = game.get_player_response_times(1)
 
-        if game.winner() == -1:
+        global comp_score_text
+        global player_score_text
+        global rounds_played
+        rounds_played += 1
+
+        if game.winner() == -1 and (player == 0 or player == 1):
             update_message("Draw!")
+            record_game_outcome(rounds_played, p1name, p2name, player_score_text, comp_score_text, p1_response_time, p2_response_time, "Draw")
         elif (game.winner() == 1 and player == 1) or (game.winner() == 0 and player == 0):
+            winner = p1name if player == 0 else p2name
             update_message("You Won!")
             update_player_score()
+            record_game_outcome(rounds_played, p1name, p2name, player_score_text, comp_score_text, p1_response_time, p2_response_time, winner)
         elif game.winner() == 0 and player == 1:
             update_message(f"{p1name} Won!")
             update_computer_score()
@@ -528,6 +557,7 @@ def main():
 
 
 if __name__ == "__main__":
+    initialize_csv()
     main()
     pygame.quit()
     

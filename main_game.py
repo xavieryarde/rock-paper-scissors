@@ -14,9 +14,15 @@ pygame.init()
 WIDTH = 900
 HEIGHT = 550
 
+
+
 # Screen
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Rock Paper Scissors")
+
+# set icon 
+icon = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "user_rock.png")))
+pygame.display.set_icon(icon)
 
 font = pygame.font.Font(os.path.abspath(os.path.join(os.path.dirname(__file__),"Retro Gaming.ttf")), 25)
 

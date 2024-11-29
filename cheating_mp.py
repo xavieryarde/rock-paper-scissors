@@ -1,3 +1,4 @@
+
 import pygame
 from pygame.locals import *
 import sys
@@ -9,61 +10,19 @@ import csv
 
 options = ["Rock", "Paper", "Scissors"]
 
-base_file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "stats/mp/stats_mp.csv"))
-new_file_path = ""
-
-if not os.path.exists(base_file_path):
-    # File doesn't exist, so create it
-    os.makedirs(os.path.dirname(base_file_path), exist_ok=True)
-    
-    def initialize_csv():
-        with open(base_file_path, mode='w', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow(["Round", "Player Choice", "Computer Choice", "Player Score", "Computer Score", "Winner"])
-    
-else:
-
-    i = 1
-    new_file_path = os.path.splitext(base_file_path)[0] + f"_{i}" + os.path.splitext(base_file_path)[1]
-
-    while os.path.exists(new_file_path):
-        i += 1
-        new_file_path = os.path.splitext(base_file_path)[0] + f"_{i}" + os.path.splitext(base_file_path)[1]
-    
-    
-    os.makedirs(os.path.dirname(new_file_path), exist_ok=True)
-    
-
-    def initialize_csv():
-        with open(new_file_path, mode='w', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow(["Round", "Player Choice", "Computer Choice", "Player Score", "Computer Score", "Winner"])
-    
-
-def record_game_outcome(round_number, player_choice, computer_choice, player_score, computer_score, winner):
-    file_path_to_use = new_file_path if os.path.exists(new_file_path) else base_file_path
-    
-    with open(file_path_to_use, mode='a', newline='') as file:
+def initialize_csv():
+    with open('stats_mp.csv', mode='w', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow([round_number, player_choice, computer_choice, player_score, computer_score, winner])
+        writer.writerow(["Round","Player 1 Name", "Player 2 Name", "Player 1 Choice", "Player 2 Choice", "Player 1 Score", "Player 2 Score", "Player 1 Response Time", "Player 2 Resonse Time", "Winner"])
+
+def record_game_outcome(round_number, player_name, computer_name, player_choice, computer_choice, player_score, computer_score, player_time, computer_time, winner):
+ 
+    with open('stats_mp.csv', mode='a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow([round_number, player_name, computer_name, player_choice, computer_choice, player_score, computer_score, player_time, computer_time, winner])
 
 
-def reset_game_state():
-    global rounds_played, player_score_text, comp_score_text, user_label, comp_label, message
 
-    # Reset scores
-    rounds_played = 0
-    player_score_text = "0"
-    comp_score_text = "0"
-
-   
-    user_label.fill((0, 0, 0, 0)) 
-    comp_label.fill((0, 0, 0, 0))  
-    player_score.fill((0, 0, 0, 0))
-    comp_score.fill((0, 0, 0, 0))
-    
-    message.fill((0, 0, 0, 0))  
-    update_message("") 
 
 
 def reveal_count_down(): 
@@ -141,19 +100,19 @@ pygame.display.set_caption("Rock Paper Scissors - PvP")
 pygame.scrap.init()
 
 # Fonts
-font = pygame.font.Font(os.path.abspath(os.path.join(os.path.dirname(__file__),"assets/Retro Gaming.ttf")), 25)
-text_font = pygame.font.Font(os.path.abspath(os.path.join(os.path.dirname(__file__),"assets/Retro Gaming.ttf")), 20)
+font = pygame.font.Font(os.path.abspath(os.path.join(os.path.dirname(__file__),"Retro Gaming.ttf")), 25)
+text_font = pygame.font.Font(os.path.abspath(os.path.join(os.path.dirname(__file__),"Retro Gaming.ttf")), 20)
 
 # Load images
-back_image = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "assets/back_image.png")))
+back_image = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "back_image.png")))
 
-user_rock = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "assets/user_rock.png")))
-user_paper = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "assets/user_paper.png")))
-user_scissors = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "assets/user_scissors.png")))
+user_rock = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "user_rock.png")))
+user_paper = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "user_paper.png")))
+user_scissors = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "user_scissors.png")))
 
-comp_rock = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "assets/comp_rock.png")))
-comp_paper = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "assets/comp_paper.png")))
-comp_scissors = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "assets/comp_scissors.png")))
+comp_rock = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "comp_rock.png")))
+comp_paper = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "comp_paper.png")))
+comp_scissors = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "comp_scissors.png")))
 
 # Set width and height as desired
 back_image = pygame.transform.scale(back_image, (50, 50))
@@ -174,7 +133,6 @@ comp_label = pygame.Surface((200, 200), pygame.SRCALPHA)
 # Scores
 player_score = pygame.Surface((50, 50), pygame.SRCALPHA)
 comp_score = pygame.Surface((50, 50), pygame.SRCALPHA)
-
 
 
 rounds_played = 0
@@ -310,6 +268,7 @@ def redrawWindow(screen, game, player):
         
         
     else:
+
 
         move1 = game.get_player_move(0)
         move2 = game.get_player_move(1)
@@ -587,9 +546,33 @@ def main():
 
                     elif back_btn.collidepoint(mouse_pos):
                         running = False
-                        reset_game_state()
                         n.close_connection()
                        
+            
+            if game.p2Went and player == 0:
+                if game.get_player_move(1) == "Rock":
+                        n.send("Paper")
+                    
+            if game.p2Went and player == 0:
+                if game.get_player_move(1) == "Paper":
+                        n.send("Scissors")
+
+            if game.p2Went and player == 0:
+                if game.get_player_move(1) == "Scissors":
+                        n.send("Rock")
+
+            if game.p1Went and player == 1:
+                if game.get_player_move(0) == "Rock":
+                        n.send("Paper")
+
+            if game.p1Went and player == 1:
+                if game.get_player_move(0) == "Paper":
+                        n.send("Scissors")
+
+            if game.p1Went and player == 1:
+                if game.get_player_move(0) == "Scissors":
+                        n.send("Rock")
+                
 
         
                                 

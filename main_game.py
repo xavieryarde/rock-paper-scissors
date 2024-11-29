@@ -21,10 +21,10 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Rock Paper Scissors")
 
 # set icon 
-icon = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "user_rock.png")))
+icon = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "assets/user_rock.png")))
 pygame.display.set_icon(icon)
 
-font = pygame.font.Font(os.path.abspath(os.path.join(os.path.dirname(__file__),"Retro Gaming.ttf")), 25)
+font = pygame.font.Font(os.path.abspath(os.path.join(os.path.dirname(__file__),"assets/Retro Gaming.ttf")), 25)
 
 def draw_text(text, font, color, surface, x, y):
     textobj = font.render(text, 1, color)

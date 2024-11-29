@@ -8,16 +8,63 @@ import csv
 
 options = ["Rock", "Paper", "Scissors"]
 
-def initialize_csv():
-    with open('stats_sp.csv', mode='w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(["Round","Player Choice", "Computer Choice", "Player Score", "Computer Score", "Winner"])
+
+base_file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "stats/sp/stats_sp.csv"))
+new_file_path = ""
+
+if not os.path.exists(base_file_path):
+    # File doesn't exist, so create it
+    os.makedirs(os.path.dirname(base_file_path), exist_ok=True)
+    
+    def initialize_csv():
+        with open(base_file_path, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(["Round", "Player Choice", "Computer Choice", "Player Score", "Computer Score", "Winner"])
+    
+else:
+
+    i = 1
+    new_file_path = os.path.splitext(base_file_path)[0] + f"_{i}" + os.path.splitext(base_file_path)[1]
+
+    while os.path.exists(new_file_path):
+        i += 1
+        new_file_path = os.path.splitext(base_file_path)[0] + f"_{i}" + os.path.splitext(base_file_path)[1]
+    
+    
+    os.makedirs(os.path.dirname(new_file_path), exist_ok=True)
+    
+
+    def initialize_csv():
+        with open(new_file_path, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(["Round", "Player Choice", "Computer Choice", "Player Score", "Computer Score", "Winner"])
+    
 
 def record_game_outcome(round_number, player_choice, computer_choice, player_score, computer_score, winner):
- 
-    with open('stats_sp.csv', mode='a', newline='') as file:
+    file_path_to_use = new_file_path if os.path.exists(new_file_path) else base_file_path
+    
+    with open(file_path_to_use, mode='a', newline='') as file:
         writer = csv.writer(file)
         writer.writerow([round_number, player_choice, computer_choice, player_score, computer_score, winner])
+
+
+def reset_game_state():
+    global rounds_played, player_score_text, comp_score_text, user_label, comp_label, message
+
+    # Reset scores
+    rounds_played = 0
+    player_score_text = "0"
+    comp_score_text = "0"
+
+   
+    user_label.fill((0, 0, 0, 0)) 
+    comp_label.fill((0, 0, 0, 0))  
+    player_score.fill((0, 0, 0, 0))
+    comp_score.fill((0, 0, 0, 0))
+    
+    message.fill((0, 0, 0, 0))  
+    update_message("")  
+
 
 def player_choice(x):
     random_num = random.randint(0, 2)
@@ -126,19 +173,19 @@ screen = pygame.display.set_mode((900, 550))
 pygame.display.set_caption("Rock Paper Scissors - PvE")
 
 # Fonts
-font = pygame.font.Font(os.path.abspath(os.path.join(os.path.dirname(__file__),"Retro Gaming.ttf")), 25)
-text_font = pygame.font.Font(os.path.abspath(os.path.join(os.path.dirname(__file__),"Retro Gaming.ttf")), 20)
+font = pygame.font.Font(os.path.abspath(os.path.join(os.path.dirname(__file__),"assets/Retro Gaming.ttf")), 25)
+text_font = pygame.font.Font(os.path.abspath(os.path.join(os.path.dirname(__file__),"assets/Retro Gaming.ttf")), 20)
 
 # Load images
-back_image = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "back_image.png")))
+back_image = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "assets/back_image.png")))
 
-user_rock = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "user_rock.png")))
-user_paper = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "user_paper.png")))
-user_scissors = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "user_scissors.png")))
+user_rock = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "assets/user_rock.png")))
+user_paper = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "assets/user_paper.png")))
+user_scissors = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "assets/user_scissors.png")))
 
-comp_rock = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "comp_rock.png")))
-comp_paper = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "comp_paper.png")))
-comp_scissors = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "comp_scissors.png")))
+comp_rock = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "assets/comp_rock.png")))
+comp_paper = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "assets/comp_paper.png")))
+comp_scissors = pygame.image.load(os.path.abspath(os.path.join(os.path.dirname(__file__), "assets/comp_scissors.png")))
 
 # Set width and height as desired
 back_image = pygame.transform.scale(back_image, (50, 50))
@@ -199,6 +246,7 @@ def main():
                     player_choice("Scissors")
                 elif back_btn.collidepoint(mouse_pos):
                     running = False
+                    reset_game_state()
                     main_game.main_menu()
                
         # Draw everything
